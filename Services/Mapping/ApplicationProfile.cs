@@ -5,7 +5,7 @@ using Models.Quiz;
 
 namespace Services.Mapping
 {
-    public class ApplicationProfile : Profile
+    public class ApplicationProfile : Profile //++
     {
         public ApplicationProfile()
         {
@@ -19,7 +19,7 @@ namespace Services.Mapping
                 .ForMember(dest => dest.Answers, opt => opt.MapFrom(src => src.Answers.Select(a => a.Text)))
                 .ForMember(dest => dest.CorrectAnswerIndex, opt => opt.MapFrom(src => src.CorrectAnswerIndex));
 
-            CreateMap<Participant, ParticipantModel>()
+            CreateMap< Paticipiant, ParticipantModel>()
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Username));
         }
     }

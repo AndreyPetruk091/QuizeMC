@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Models\Models.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\Repositories.Abstractions\Repositories.Abstractions.csproj" />
   </ItemGroup>
 

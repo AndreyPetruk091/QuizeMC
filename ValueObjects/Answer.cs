@@ -6,6 +6,7 @@ namespace ValueObjects
     public class Answer : ValueObject
     {
         public string Value { get; }
+    
 
         public Answer(string value)
         {

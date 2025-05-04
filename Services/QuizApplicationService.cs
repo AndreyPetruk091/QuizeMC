@@ -18,14 +18,14 @@ namespace Services
 
         public async Task<IEnumerable<QuizModel>> GetActiveQuizzesAsync(CancellationToken cancellationToken)
         {
-            var quizzes = await quizRepository.GetActiveQuizzesAsync(cancellationToken);
+            var quizzes = await quizRepository.GetActiveQuizzesAsync(cancellationToken); //++
             return mapper.Map<IEnumerable<QuizModel>>(quizzes);
         }
 
         public async Task<QuizModel?> CreateQuizAsync(QuizModelCreate quizInfo, CancellationToken cancellationToken)
         {
             var quiz = new Quiz(quizInfo.Title);
-            var createdQuiz = await quizRepository.AddAsync(quiz, cancellationToken);
+            var createdQuiz = await quizRepository.AddAsync(quiz, cancellationToken); // 
             return createdQuiz == null ? null : mapper.Map<QuizModel>(createdQuiz);
         }
 
