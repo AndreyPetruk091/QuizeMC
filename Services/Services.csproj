@@ -6,4 +6,16 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="MassTransit.Abstractions" Version="8.3.1" />
+    <PackageReference Include="Otus.QueueDto" Version="1.0.5.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Models\Models.csproj" />
+    <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Repositories.Abstractions\Repositories.Abstractions.csproj" />
+  </ItemGroup>
+
 </Project>
