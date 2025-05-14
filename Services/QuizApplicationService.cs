@@ -6,18 +6,19 @@ using AutoMapper;
 using ValueObjects;
 
 using Services.Abstractions;
+using Application.Models.Quiz;
 
 namespace Services.Implementations
 {
     public sealed class QuizApplicationService : IQuizApplicationService
     {
-        private readonly IQuizRepository _quizRepository;
-        private readonly IQuestionRepository _questionRepository;
+        private readonly IQuiz _quizRepository;
+        private readonly IQuestion _questionRepository;
         private readonly IMapper _mapper;
 
         public QuizApplicationService(
-            IQuizRepository quizRepository,
-            IQuestionRepository questionRepository,
+            IQuiz quizRepository,
+            IQuestion questionRepository,
             IMapper mapper)
         {
             _quizRepository = quizRepository;
@@ -33,11 +34,11 @@ namespace Services.Implementations
 
         public async Task<IEnumerable<QuizModel>> GetActiveQuizzesAsync(int skip, int take, CancellationToken ct)
         {
-            var quizzes = await _quizRepository.GetActiveQuizzesAsync(skip, take, ct);
+            var quizzes = await _quizRepository.(skip, take, ct);
             return _mapper.Map<IEnumerable<QuizModel>>(quizzes);
         }
 
-        public async Task<QuizModel?> CreateQuizAsync(QuizModelCreate model, CancellationToken ct)
+        public async Task<QuizModel?> CreateQuizAsync(CreateQuizModel model, CancellationToken ct)
         {
             var quizTitle = new QuizTitle(model.Title);
             if (await _quizRepository.ExistsByTitleAsync(quizTitle.Value, ct))
@@ -70,6 +71,11 @@ namespace Services.Implementations
 
             quiz.Publish();
             return await _quizRepository.UpdateAsync(quiz, ct);
+        }
+
+        public Task<QuizModel?> CreateQuizAsync(CreateQuizModel model, CancellationToken ct)
+        {
+            throw new NotImplementedException();
         }
     }
 }

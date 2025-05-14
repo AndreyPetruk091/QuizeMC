@@ -9,11 +9,11 @@ namespace Services.Implementations
 {
     public class ParticipantApplicationService : IParticipantApplicationService
     {
-        private readonly IParticipantRepository _participantRepository;
+        private readonly IParticipant _participantRepository;
         private readonly IMapper _mapper;
 
         public ParticipantApplicationService(
-            IParticipantRepository participantRepository,
+            IParticipant participantRepository,
             IMapper mapper)
         {
             _participantRepository = participantRepository;
@@ -22,12 +22,12 @@ namespace Services.Implementations
 
         public async Task<ParticipantModel?> CreateParticipantAsync(ParticipantCreateModel participantInfo, CancellationToken cancellationToken)
         {
-            // Валидация и преобразование string -> Username Value Object
+          
             if (string.IsNullOrWhiteSpace(participantInfo.Username))
                 return null;
 
             var username = new Username(participantInfo.Username);
-            var participant = new Paticipiant(username);
+            var participant = new Participant(username);
 
             var created = await _participantRepository.AddAsync(participant, cancellationToken);
             return created == null ? null : _mapper.Map<ParticipantModel>(created);
@@ -41,7 +41,7 @@ namespace Services.Implementations
 
         public async Task<ParticipantModel?> GetParticipantByUsernameAsync(string username, CancellationToken cancellationToken)
         {
-            var participant = await _participantRepository.GetParticipantByUsernameAsync(username, cancellationToken);
+            var participant = await _participantRepository.GetByUsernameAsync(username, cancellationToken);
             return participant == null ? null : _mapper.Map<ParticipantModel>(participant);
         }
     }

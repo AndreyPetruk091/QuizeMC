@@ -7,20 +7,20 @@ using ValueObjects;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
-using Domain.Exeptions;
+using Domain.Exceptions;
 using Services.Abstractions;
 
 namespace Services.Implementations
 {
     public class QuestionApplicationService : IQuestionApplicationService
     {
-        private readonly IQuestionRepository _questionRepository;
-        private readonly IQuizRepository _quizRepository;
+        private readonly IQuestion _questionRepository;
+        private readonly IQuiz _quizRepository;
         private readonly IMapper _mapper;
 
         public QuestionApplicationService(
-            IQuestionRepository questionRepository,
-            IQuizRepository quizRepository,
+            IQuestion questionRepository,
+            IQuiz quizRepository,
             IMapper mapper)
         {
             _questionRepository = questionRepository;
@@ -63,10 +63,10 @@ namespace Services.Implementations
             var question = await _questionRepository.GetByIdAsync(questionId, cancellationToken);
             if (question == null) return false;
 
-            var quiz = await _quizRepository.GetQuizByQuestionIdAsync(questionId, cancellationToken);
+            var quiz = await _quizRepository.GetByIdAsync(questionId, cancellationToken);
             if (quiz != null)
             {
-                quiz.RemoveQuestion(question);
+                quiz.AddQuestion(question);
                 if (!await _quizRepository.UpdateAsync(quiz, cancellationToken))
                 {
                     return false;
