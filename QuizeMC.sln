@@ -36,7 +36,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFramework", "EntityFr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediatR", "..\MediatR\MediatR.csproj", "{905731C7-4800-4308-A269-800C0EC0F2D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Queues", "..\Queues\Queues.csproj", "{AEDF3E7C-DC51-413D-A21B-AD12AC19D766}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quiz.Implementations", "..\Queues\Quiz.Implementations.csproj", "{AEDF3E7C-DC51-413D-A21B-AD12AC19D766}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ", "..\RabbitMQ\RabbitMQ.csproj", "{960FD9EE-DC08-4665-BB74-7CA9E31EEF1D}"
 EndProject
