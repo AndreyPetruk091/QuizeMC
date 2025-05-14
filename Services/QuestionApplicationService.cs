@@ -4,40 +4,91 @@ using Models.Question;
 using Repositories.Abstractions;
 using Services.Abstactions;
 using ValueObjects;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Linq;
+using Domain.Exeptions;
+using Services.Abstractions;
 
-namespace Services
+namespace Services.Implementations
 {
-    public class QuestionApplicationService(
-        IQuestionRepository questionRepository,
-        IQuizRepository quizRepository,
-        IMapper mapper) : IQuestionApplicationService
+    public class QuestionApplicationService : IQuestionApplicationService
     {
-        public async Task<bool> AddQuestionToQuizAsync(AddQuestionCommand command, CancellationToken cancellationToken) //++
+        private readonly IQuestionRepository _questionRepository;
+        private readonly IQuizRepository _quizRepository;
+        private readonly IMapper _mapper;
+
+        public QuestionApplicationService(
+            IQuestionRepository questionRepository,
+            IQuizRepository quizRepository,
+            IMapper mapper)
         {
-            var quiz = await quizRepository.GetByIdAsync(command.QuizId, cancellationToken);
-            if (quiz == null) return false;
+            _questionRepository = questionRepository;
+            _quizRepository = quizRepository;
+            _mapper = mapper;
+        }
 
-            var question = new Question(
-                command.Question.Text,
-                command.Question.Answers.Select(a => new Answer(a.Text)).ToList(),
-                command.Question.CorrectAnswerIndex);
+        public async Task<QuestionModel?> AddQuestionToQuizAsync(AddQuestionCommand command, CancellationToken cancellationToken)
+        {
+            var quiz = await _quizRepository.GetByIdAsync(command.QuizId, cancellationToken);
+            if (quiz == null) return null;
 
-            quiz.AddQuestion(question);
-            return await quizRepository.UpdateAsync(quiz, cancellationToken);
+            try
+            {
+                var question = new Question(
+                    new QuestionText(command.Question.Text),
+                    command.Question.Answers.Select(a => new Answer(new AnswerText(a.Text))).ToList(),
+                    new AnswerIndex(command.Question.CorrectAnswerIndex));
+
+                quiz.AddQuestion(question);
+                return await _quizRepository.UpdateAsync(quiz, cancellationToken)
+                    ? _mapper.Map<QuestionModel>(question)
+                    : null;
+            }
+            catch (DomainException ex)
+            {
+                // Логирование ошибки при необходимости
+                return null;
+            }
         }
 
         public async Task<QuestionModel?> GetQuestionByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            var question = await questionRepository.GetByIdAsync(id, cancellationToken);
-            return question == null ? null : mapper.Map<QuestionModel>(question);
+            var question = await _questionRepository.GetByIdAsync(id, cancellationToken);
+            return question == null ? null : _mapper.Map<QuestionModel>(question);
         }
 
         public async Task<bool> RemoveQuestionFromQuizAsync(Guid questionId, CancellationToken cancellationToken)
         {
-            var question = await questionRepository.GetByIdAsync(questionId, cancellationToken);
+            var question = await _questionRepository.GetByIdAsync(questionId, cancellationToken);
             if (question == null) return false;
 
-            return await questionRepository.DeleteAsync(question, cancellationToken);
+            var quiz = await _quizRepository.GetQuizByQuestionIdAsync(questionId, cancellationToken);
+            if (quiz != null)
+            {
+                quiz.RemoveQuestion(question);
+                if (!await _quizRepository.UpdateAsync(quiz, cancellationToken))
+                {
+                    return false;
+                }
+            }
+
+            return await _questionRepository.DeleteAsync(question, cancellationToken);
+        }
+
+        Task<bool> IQuestionApplicationService.AddQuestionToQuizAsync(Guid quizId, QuestionCreateModel model, CancellationToken ct)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<QuestionModel?> IQuestionApplicationService.GetQuestionByIdAsync(Guid id, CancellationToken ct)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<bool> IQuestionApplicationService.RemoveQuestionFromQuizAsync(Guid questionId, CancellationToken ct)
+        {
+            throw new NotImplementedException();
         }
     }
 }

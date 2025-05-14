@@ -1,11 +1,10 @@
 ﻿using Domain.Entities;
 
-
 namespace Repositories.Abstractions
 {
-    public interface IQuestionRepository : IRepository<Question> 
+    public interface IQuestion : IRepository<Question>
     {
-        Task<IEnumerable<Question>> GetQuestionsByQuizIdAsync(Guid quizId, CancellationToken cancellationToken);
-        Task<Question?> GetQuestionByIdAsync(Guid questionId, CancellationToken cancellationToken);
+        Task<IEnumerable<Question>> GetByQuizIdAsync(Guid quizId, CancellationToken ct);
+        Task<Question?> GetWithAnswersAsync(Guid questionId, CancellationToken ct);
     }
 }

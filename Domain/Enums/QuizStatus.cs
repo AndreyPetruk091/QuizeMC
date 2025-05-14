@@ -1,11 +1,10 @@
-﻿
-
-namespace Domain.Enums
+﻿namespace Domain.Enums
 {
     public enum QuizStatus
     {
-        Active,
-        Inactive,
-        Archived
+        Draft,      // Черновик (не опубликован)
+        Active,     // Активен
+        Inactive,   // Скрыт
+        Archived    // В архиве (нельзя изменить)
     }
 }

@@ -1,7 +1,6 @@
-﻿
-namespace ValueObjects.Base
+﻿namespace ValueObjects.Base
 {
-    public abstract class ValueObject: IEquatable<ValueObject>
+    public abstract class ValueObject : IEquatable<ValueObject>
     {
         protected abstract IEnumerable<object> GetAtomicValues();
 

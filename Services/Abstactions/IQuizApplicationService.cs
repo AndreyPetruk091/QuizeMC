@@ -1,14 +1,15 @@
-﻿
+﻿using Application.Models.Quiz;
 using Models.Quiz;
 
-namespace Services.Abstactions
+
+namespace Services.Abstractions
 {
     public interface IQuizApplicationService
     {
-        Task<QuizModel?> GetQuizByIdAsync(Guid id, CancellationToken cancellationToken);
-        Task<IEnumerable<QuizModel>> GetActiveQuizzesAsync(CancellationToken cancellationToken);
-        Task<QuizModel?> CreateQuizAsync(QuizModelCreate quizInfo, CancellationToken cancellationToken);
-        Task<bool> UpdateQuizAsync(QuizModel quiz, CancellationToken cancellationToken);
-        Task<bool> DeleteQuizAsync(Guid id, CancellationToken cancellationToken);
+        Task<QuizModel?> GetQuizByIdAsync(Guid id, CancellationToken ct);
+        Task<IEnumerable<QuizModel>> GetActiveQuizzesAsync(int skip, int take, CancellationToken ct);
+        Task<QuizModel?> CreateQuizAsync(CreateQuizModel model, CancellationToken ct);
+        Task<bool> UpdateQuizAsync(QuizModel model, CancellationToken ct);
+        Task<bool> DeleteQuizAsync(Guid id, CancellationToken ct);
     }
 }

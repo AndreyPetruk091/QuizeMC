@@ -1,13 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Models.Quiz;
+using Common.Enums;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Services.Abstactions
 {
     public interface IQuizResponseService
     {
-        Task<QuizResponseStatus> SubmitResponseAsync(SubmitResponseModel response, CancellationToken cancellationToken);
+        /// <summary>
+        /// Отправка ответа на вопрос викторины
+        /// </summary>
+        /// <param name="response">Модель ответа</param>
+        /// <param name="cancellationToken">Токен отмены</param>
+        /// <returns>Статус обработки ответа</returns>
+        Task<QuizResponseStatus> SubmitResponseAsync(
+            SubmitResponseModel response,
+            CancellationToken cancellationToken = default);
     }
-} //+++++++++++++++++++++
+}

@@ -11,11 +11,11 @@ namespace ValueObjects
         public QuestionText(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new  QuestionTextException(ExeptionMasseges.EmptyQuestionText);
+                throw new  QuestionTextException(ExceptionMessages.NullValue);
 
             if (value.Length > MaxLength)
                 throw new QuestionTextException(
-                    ExeptionMasseges.Format(ExeptionMasseges.QuestionTextTooLong, MaxLength));
+                    ExceptionMessages.Format(ExceptionMessages.NullValue, MaxLength));
 
             Value = value;
         }

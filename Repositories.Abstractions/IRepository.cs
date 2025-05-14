@@ -1,18 +1,20 @@
 ﻿using Domain.Entities.Base;
 
-
 namespace Repositories.Abstractions
 {
-    public interface IRepository<TEntity>
-        where TEntity : EntityBase 
+    /// <summary>
+    /// Базовый интерфейс репозитория для сущностей
+    /// </summary>
+    /// <typeparam name="TEntity">Тип сущности, наследуемый от EntityBase</typeparam>
+    public interface IRepository<TEntity> where TEntity : EntityBase
     {
-
-        Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken, bool asNoTracking = false);
-        Task<TEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
-        Task<TEntity?> AddAsync(TEntity entity, CancellationToken cancellationToken);
-        Task<bool> UpdateAsync(TEntity entity, CancellationToken cancellationToken);
-        Task<bool> DeleteAsync(TEntity entity, CancellationToken cancellationToken);
-        Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken);
-
+        Task<TEntity?> GetByIdAsync(Guid id, CancellationToken ct);
+        Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken ct);
+        Task<IEnumerable<TEntity>> GetAllNoTrackingAsync(CancellationToken ct);
+        Task<bool> AddAsync(TEntity entity, CancellationToken ct);
+        Task<bool> UpdateAsync(TEntity entity, CancellationToken ct);
+        Task<bool> DeleteAsync(TEntity entity, CancellationToken ct);
+        Task<bool> DeleteAsync(Guid id, CancellationToken ct);
+        Task<int> CountAsync(CancellationToken ct);
     }
 }

@@ -1,11 +1,8 @@
-﻿
-
-namespace Domain.Exeptions
+﻿namespace Domain.Exceptions
 {
     public class QuizException : DomainException
     {
-        public QuizException(string message) : base(message)
-        {
-        }
+        public QuizException(string message, Guid? quizId = null)
+            : base(message, quizId) { }
     }
 }

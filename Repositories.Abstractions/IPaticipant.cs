@@ -2,9 +2,9 @@
 
 namespace Repositories.Abstractions
 {
-    public interface IParticipantRepository : IRepository<Paticipiant>
+    public interface IParticipant : IRepository<Participant>
     {
-
-        Task<Paticipiant?> GetParticipantByUsernameAsync(string username, CancellationToken cancellationToken);
+        Task<Participant?> GetByUsernameAsync(string username, CancellationToken ct);
+        Task<bool> ExistsByUsernameAsync(string username, CancellationToken ct);
     }
 }

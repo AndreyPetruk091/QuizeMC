@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using AutoMapper;
+using Domain.Entities;
 using Models.Paticipiant;
 using Models.Question;
 using Models.Quiz;
@@ -16,7 +17,7 @@ namespace Services.Mapping
 
             CreateMap<Question, QuestionModel>()
                 .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Text))
-                .ForMember(dest => dest.Answers, opt => opt.MapFrom(src => src.Answers.Select(a => a.Text)))
+                .ForMember(dest => dest.Answers, opt => opt.MapFrom(src => src.Answers.Select(a => a.Value)))
                 .ForMember(dest => dest.CorrectAnswerIndex, opt => opt.MapFrom(src => src.CorrectAnswerIndex));
 
             CreateMap< Paticipiant, ParticipantModel>()

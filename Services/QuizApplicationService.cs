@@ -3,45 +3,73 @@ using Models.Quiz;
 using Repositories.Abstractions;
 using Services.Abstactions;
 using AutoMapper;
+using ValueObjects;
 
-namespace Services
+using Services.Abstractions;
+
+namespace Services.Implementations
 {
-    public class QuizApplicationService(
-        IQuizRepository quizRepository,
-        IMapper mapper) : IQuizApplicationService
+    public sealed class QuizApplicationService : IQuizApplicationService
     {
-        public async Task<QuizModel?> GetQuizByIdAsync(Guid id, CancellationToken cancellationToken)
+        private readonly IQuizRepository _quizRepository;
+        private readonly IQuestionRepository _questionRepository;
+        private readonly IMapper _mapper;
+
+        public QuizApplicationService(
+            IQuizRepository quizRepository,
+            IQuestionRepository questionRepository,
+            IMapper mapper)
         {
-            var quiz = await quizRepository.GetByIdAsync(id, cancellationToken);
-            return quiz == null ? null : mapper.Map<QuizModel>(quiz);
+            _quizRepository = quizRepository;
+            _questionRepository = questionRepository;
+            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<QuizModel>> GetActiveQuizzesAsync(CancellationToken cancellationToken)
+        public async Task<QuizModel?> GetQuizByIdAsync(Guid id, CancellationToken ct)
         {
-            var quizzes = await quizRepository.GetActiveQuizzesAsync(cancellationToken); //++
-            return mapper.Map<IEnumerable<QuizModel>>(quizzes);
+            var quiz = await _quizRepository.GetByIdAsync(id, ct);
+            return quiz == null ? null : _mapper.Map<QuizModel>(quiz);
         }
 
-        public async Task<QuizModel?> CreateQuizAsync(QuizModelCreate quizInfo, CancellationToken cancellationToken)
+        public async Task<IEnumerable<QuizModel>> GetActiveQuizzesAsync(int skip, int take, CancellationToken ct)
         {
-            var quiz = new Quiz(quizInfo.Title);
-            var createdQuiz = await quizRepository.AddAsync(quiz, cancellationToken); // 
-            return createdQuiz == null ? null : mapper.Map<QuizModel>(createdQuiz);
+            var quizzes = await _quizRepository.GetActiveQuizzesAsync(skip, take, ct);
+            return _mapper.Map<IEnumerable<QuizModel>>(quizzes);
         }
 
-        public async Task<bool> UpdateQuizAsync(QuizModel quiz, CancellationToken cancellationToken)
+        public async Task<QuizModel?> CreateQuizAsync(QuizModelCreate model, CancellationToken ct)
         {
-            var entity = await quizRepository.GetByIdAsync(quiz.Id, cancellationToken);
-            if (entity == null) return false;
+            var quizTitle = new QuizTitle(model.Title);
+            if (await _quizRepository.ExistsByTitleAsync(quizTitle.Value, ct))
+                return null;
 
-            entity = mapper.Map<Quiz>(quiz);
-            return await quizRepository.UpdateAsync(entity, cancellationToken);
+            var quiz = new Quiz(quizTitle);
+            var createdQuiz = await _quizRepository.AddAsync(quiz, ct);
+            return createdQuiz == null ? null : _mapper.Map<QuizModel>(createdQuiz);
         }
 
-        public async Task<bool> DeleteQuizAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<bool> UpdateQuizAsync(QuizModel model, CancellationToken ct)
         {
-            var quiz = await quizRepository.GetByIdAsync(id, cancellationToken);
-            return quiz != null && await quizRepository.DeleteAsync(quiz, cancellationToken);
+            var existingQuiz = await _quizRepository.GetByIdAsync(model.Id, ct);
+            if (existingQuiz == null) return false;
+
+            _mapper.Map(model, existingQuiz);
+            return await _quizRepository.UpdateAsync(existingQuiz, ct);
+        }
+
+        public async Task<bool> DeleteQuizAsync(Guid id, CancellationToken ct)
+        {
+            var quiz = await _quizRepository.GetByIdAsync(id, ct);
+            return quiz != null && await _quizRepository.DeleteAsync(quiz, ct);
+        }
+
+        public async Task<bool> PublishQuizAsync(Guid quizId, CancellationToken ct)
+        {
+            var quiz = await _quizRepository.GetByIdAsync(quizId, ct);
+            if (quiz == null || !quiz.Questions.Any()) return false;
+
+            quiz.Publish();
+            return await _quizRepository.UpdateAsync(quiz, ct);
         }
     }
 }

@@ -1,45 +1,47 @@
 ﻿using Domain.Entities.Base;
-using ValueObjects;
 using Domain.Enums;
+using Domain.Exceptions;
+
+using ValueObjects;
 
 namespace Domain.Entities
 {
-    public class Quiz: EntityBase
+    public class Quiz : EntityBase
     {
-        private readonly HashSet<Question> _questions = new();
-        public QuizTitle Title { get; private set; }
-        public IEnumerable<Question> Questions => _questions.AsEnumerable();
+        public QuizTitle Title { get; }
         public QuizStatus Status { get; private set; }
+        private readonly List<Question> _questions = new();
+        public IReadOnlyCollection<Question> Questions => _questions.AsReadOnly();
+        private const int MaxQuestions = 100;
 
         public Quiz(QuizTitle title)
         {
-            Title = title ?? throw new ArgumentNullException(nameof(title));
+            Title = title ?? throw new QuizException("Quiz title cannot be null.");
+            Status = QuizStatus.Draft;
+        }
+
+        public void Publish()
+        {
+            if (Status == QuizStatus.Archived)
+                throw new QuizException("Archived quiz cannot be published.");
+
+            if (_questions.Count == 0)
+                throw new QuizException("Cannot publish quiz without questions.");
+
             Status = QuizStatus.Active;
         }
 
-        // Добавление вопроса
         public void AddQuestion(Question question)
         {
-            if (question == null)
-                throw new ArgumentNullException(nameof(question));
+            if (_questions.Count >= MaxQuestions)
+                throw new QuizException($"Quiz cannot have more than {MaxQuestions} questions.");
 
-            if (Status != QuizStatus.Active)
-                throw new InvalidOperationException("Вопросы можно добавлять только в активную викторину");
-
-            _questions.Add(question);
+            _questions.Add(question ?? throw new QuizException("Question cannot be null."));
         }
 
-        // Удаление вопроса
-        public void RemoveQuestion(Question question)
+        public void Archive()
         {
-            if (question == null)
-                throw new ArgumentNullException(nameof(question));
-
-            _questions.Remove(question);
+            Status = QuizStatus.Archived;
         }
-
-        // Методы для управления статусом
-        public void CompleteQuiz() => Status = QuizStatus.Active;
-        public void ArchiveQuiz() => Status = QuizStatus.Archived;
     }
 }

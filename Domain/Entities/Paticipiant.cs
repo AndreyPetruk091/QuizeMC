@@ -1,20 +1,33 @@
 ﻿using Domain.Entities.Base;
+using Domain.Exceptions;
 using ValueObjects;
-using ValueObjects.Exceptions;
 
 namespace Domain.Entities
 {
-    public class Paticipiant : EntityBase
+    public class Participant : EntityBase
     {
         public Username Username { get; private set; }
+        public bool IsBanned { get; private set; }
 
-        public Paticipiant (Username username)
+        public Participant(Username username)
         {
             Username = username ?? throw new UsernameException("Username cannot be null.");
+            IsBanned = false;
+        }
+
+        public void Ban(string reason)
+        {
+            if (IsBanned)
+                throw new DomainException($"Participant {Id} is already banned.");
+
+            IsBanned = true;
         }
 
         public void UpdateUsername(Username newUsername)
         {
+            if (IsBanned)
+                throw new DomainException("Banned participants cannot change username.");
+
             Username = newUsername ?? throw new UsernameException("Username cannot be null.");
         }
     }

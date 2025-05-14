@@ -1,18 +1,17 @@
 ﻿using ValueObjects.Base;
 using ValueObjects.Exceptions;
-using ValueObjects.Validators;
 
 namespace ValueObjects
 {
-    public sealed class Username : ValueObject
+    public sealed class AnswerText : ValueObject
     {
         public string Value { get; }
-        private static readonly UsernameValidator Validator = new();
 
-        public Username(string value)
+        public AnswerText(string value)
         {
-            Validator.Validate(value);
-            Value = value.Trim();
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException("Answer text cannot be empty");
+            Value = value;
         }
 
         protected override IEnumerable<object> GetAtomicValues()

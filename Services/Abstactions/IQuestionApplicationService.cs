@@ -1,11 +1,12 @@
 ﻿using Models.Question;
 
-namespace Services.Abstactions
+
+namespace Services.Abstractions
 {
     public interface IQuestionApplicationService
     {
-        Task<QuestionModel?> GetQuestionByIdAsync(Guid id, CancellationToken cancellationToken);
-        Task<bool> AddQuestionToQuizAsync(AddQuestionCommand command, CancellationToken cancellationToken); //++
-        Task<bool> RemoveQuestionFromQuizAsync(Guid questionId, CancellationToken cancellationToken);
+        Task<QuestionModel?> GetQuestionByIdAsync(Guid id, CancellationToken ct);
+        Task<bool> AddQuestionToQuizAsync(Guid quizId, QuestionCreateModel model, CancellationToken ct);
+        Task<bool> RemoveQuestionFromQuizAsync(Guid questionId, CancellationToken ct);
     }
 }

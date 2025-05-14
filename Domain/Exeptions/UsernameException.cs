@@ -1,10 +1,7 @@
-﻿
-namespace Domain.Exeptions
+﻿namespace Domain.Exceptions
 {
     public class UsernameException : DomainException
     {
-        public UsernameException(string message) : base(message)
-        {
-        }
+        public UsernameException(string message) : base(message) { }
     }
 }

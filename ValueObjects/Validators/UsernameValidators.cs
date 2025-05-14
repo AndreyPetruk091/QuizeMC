@@ -4,25 +4,27 @@ using ValueObjects.Exceptions;
 
 namespace ValueObjects.Validators
 {
-    public class UsernameValidator : IValidator <string>
+    public class UsernameValidator : IValidator<string>
     {
         private const int MinLength = 3;
         private const int MaxLength = 50;
-        private const string AllowedCharsPattern = @"^[a-zA-Z0-9_\-\.]+$";
+        private static readonly Regex ValidCharsRegex = new(@"^[a-zA-Z0-9_\-\.]+$");
 
         public void Validate(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new UsernameException("Username cannot be empty");
+                throw new UsernameException(ExceptionMessages.EmptyValue);
 
             if (value.Length < MinLength)
-                throw new UsernameException($"Username must be at least {MinLength} characters");
+                throw new UsernameException(
+                    ExceptionMessages.Format(ExceptionMessages.UsernameTooShort, MinLength));
 
             if (value.Length > MaxLength)
-                throw new UsernameException($"Username cannot exceed {MaxLength} characters");
+                throw new UsernameException(
+                    ExceptionMessages.Format(ExceptionMessages.UsernameTooLong, MaxLength));
 
-            if (!Regex.IsMatch(value, AllowedCharsPattern))
-                throw new UsernameException("Username contains invalid characters");
+            if (!ValidCharsRegex.IsMatch(value))
+                throw new UsernameException(ExceptionMessages.UsernameInvalidChars);
         }
     }
 }

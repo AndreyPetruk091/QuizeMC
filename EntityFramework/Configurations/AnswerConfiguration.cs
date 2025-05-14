@@ -1,8 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Domain.Entities;
 using ValueObjects;
-
 
 namespace EntityFramework.Configurations
 {
@@ -10,13 +9,19 @@ namespace EntityFramework.Configurations
     {
         public void Configure(EntityTypeBuilder<Answer> builder)
         {
-            builder.HasKey(x => x.Id);
-            builder.Property(x => x.Id).IsRequired();
-
-            builder.Property(x => x.Text)
+           
+            // Настройка поля Value (хранится как обычный текст в БД)
+            builder.Property(x => x.Value)
+                .HasColumnName("Text")  // Опционально: переименовать столбец в БД
                 .IsRequired()
-                .HasConversion(text => text.Value, str => new AnswerText(str))
-                .HasMaxLength(200);
+                .HasMaxLength(200);    // Ограничение длины
+
+            // Связь с Question (Answer принадлежит Question)
+            builder.HasOne<Question>()
+                .WithMany(q => q.Answers)
+                .HasForeignKey("QuestionId")  // Теньное свойство для внешнего ключа
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);  // Удалять ответы при удалении вопроса
         }
     }
 }

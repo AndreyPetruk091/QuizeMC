@@ -1,11 +1,7 @@
-﻿
-
-namespace Domain.Exeptions
+﻿namespace Domain.Exceptions
 {
     public class QuestionException : DomainException
     {
-        public QuestionException(string message) : base(message)
-        {
-        }
+        public QuestionException(string message) : base(message) { }
     }
 }

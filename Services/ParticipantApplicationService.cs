@@ -1,27 +1,48 @@
-﻿using AutoMapper;
-using  Domain.Entities;
+﻿using Domain.Entities;
 using Models.Paticipiant;
 using Repositories.Abstractions;
 using Services.Abstactions;
+using AutoMapper;
+using ValueObjects;
 
-
-namespace Services
+namespace Services.Implementations
 {
-    public class ParticipantApplicationService(
-        IParticipantRepository participantRepository,
-        IMapper mapper) : IParticipantApplicationService
+    public class ParticipantApplicationService : IParticipantApplicationService
     {
+        private readonly IParticipantRepository _participantRepository;
+        private readonly IMapper _mapper;
+
+        public ParticipantApplicationService(
+            IParticipantRepository participantRepository,
+            IMapper mapper)
+        {
+            _participantRepository = participantRepository;
+            _mapper = mapper;
+        }
+
         public async Task<ParticipantModel?> CreateParticipantAsync(ParticipantCreateModel participantInfo, CancellationToken cancellationToken)
         {
-            var participant = new Paticipiant(participantInfo.Username);
-            var created = await participantRepository.AddAsync(participant, cancellationToken);
-            return created == null ? null : mapper.Map<ParticipantModel>(created);
+            // Валидация и преобразование string -> Username Value Object
+            if (string.IsNullOrWhiteSpace(participantInfo.Username))
+                return null;
+
+            var username = new Username(participantInfo.Username);
+            var participant = new Paticipiant(username);
+
+            var created = await _participantRepository.AddAsync(participant, cancellationToken);
+            return created == null ? null : _mapper.Map<ParticipantModel>(created);
         }
 
         public async Task<ParticipantModel?> GetParticipantByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            var participant = await participantRepository.GetByIdAsync(id, cancellationToken);
-            return participant == null ? null : mapper.Map<ParticipantModel>(participant);
+            var participant = await _participantRepository.GetByIdAsync(id, cancellationToken);
+            return participant == null ? null : _mapper.Map<ParticipantModel>(participant);
+        }
+
+        public async Task<ParticipantModel?> GetParticipantByUsernameAsync(string username, CancellationToken cancellationToken)
+        {
+            var participant = await _participantRepository.GetParticipantByUsernameAsync(username, cancellationToken);
+            return participant == null ? null : _mapper.Map<ParticipantModel>(participant);
         }
     }
 }
