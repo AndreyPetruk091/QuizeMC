@@ -39,6 +39,32 @@ namespace QuizeMC.Infrastructure.EntityFramework.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ParticipantQuiz",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ParticipantId = table.Column<Guid>(type: "uuid", nullable: false),
+                    QuizId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ParticipantQuiz", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ParticipantQuiz_Participants_ParticipantId",
+                        column: x => x.ParticipantId,
+                        principalTable: "Participants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ParticipantQuiz_Quizzes_QuizId",
+                        column: x => x.QuizId,
+                        principalTable: "Quizzes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Questions",
                 columns: table => new
                 {
@@ -78,6 +104,16 @@ namespace QuizeMC.Infrastructure.EntityFramework.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_ParticipantQuiz_ParticipantId",
+                table: "ParticipantQuiz",
+                column: "ParticipantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ParticipantQuiz_QuizId",
+                table: "ParticipantQuiz",
+                column: "QuizId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Questions_QuizId",
                 table: "Questions",
                 column: "QuizId");
@@ -90,10 +126,13 @@ namespace QuizeMC.Infrastructure.EntityFramework.Migrations
                 name: "Answer");
 
             migrationBuilder.DropTable(
-                name: "Participants");
+                name: "ParticipantQuiz");
 
             migrationBuilder.DropTable(
                 name: "Questions");
+
+            migrationBuilder.DropTable(
+                name: "Participants");
 
             migrationBuilder.DropTable(
                 name: "Quizzes");

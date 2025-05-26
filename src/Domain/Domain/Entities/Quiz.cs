@@ -1,7 +1,8 @@
-﻿using QuizeMC.Domain.Enums; // Добавлена директива для QuizStatus
+﻿using QuizeMC.Domain.Enums;
 using QuizeMC.Domain.Exceptions;
 using QuizeMC.Domain.Entities.Base;
 using QuizeMC.Domain.ValueObjects;
+using System.Collections.Generic;
 
 namespace QuizeMC.Domain.Entities
 {
@@ -11,6 +12,10 @@ namespace QuizeMC.Domain.Entities
         public QuizStatus Status { get; private set; }
         private readonly List<Question> _questions = new();
         public virtual IReadOnlyCollection<Question> Questions => _questions.AsReadOnly();
+
+        // Навигационное свойство для связи многие-ко-многим с Participant
+        public virtual ICollection<ParticipantQuiz> Participants { get; private set; } = new List<ParticipantQuiz>();
+
         private const int MaxQuestions = 100;
 
         // Конструктор для EF Core
@@ -44,6 +49,17 @@ namespace QuizeMC.Domain.Entities
         public void Archive()
         {
             Status = QuizStatus.Archived;
+        }
+
+        // Метод для добавления участника, прошедшего квиз
+        public void AddParticipant(Participant participant, DateTime completionTime)
+        {
+            Participants.Add(new ParticipantQuiz
+            {
+                Quiz = this,
+                Participant = participant,
+                CompletedAt = completionTime
+            });
         }
     }
 }

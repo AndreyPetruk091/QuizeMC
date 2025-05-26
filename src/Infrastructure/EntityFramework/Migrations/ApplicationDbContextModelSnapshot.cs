@@ -22,6 +22,30 @@ namespace QuizeMC.Infrastructure.EntityFramework.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("ParticipantQuiz", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ParticipantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("QuizId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParticipantId");
+
+                    b.HasIndex("QuizId");
+
+                    b.ToTable("ParticipantQuiz");
+                });
+
             modelBuilder.Entity("QuizeMC.Domain.Entities.Participant", b =>
                 {
                     b.Property<Guid>("Id")
@@ -81,6 +105,25 @@ namespace QuizeMC.Infrastructure.EntityFramework.Migrations
                     b.ToTable("Quizzes");
                 });
 
+            modelBuilder.Entity("ParticipantQuiz", b =>
+                {
+                    b.HasOne("QuizeMC.Domain.Entities.Participant", "Participant")
+                        .WithMany("CompletedQuizzes")
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QuizeMC.Domain.Entities.Quiz", "Quiz")
+                        .WithMany("Participants")
+                        .HasForeignKey("QuizId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Participant");
+
+                    b.Navigation("Quiz");
+                });
+
             modelBuilder.Entity("QuizeMC.Domain.Entities.Question", b =>
                 {
                     b.HasOne("QuizeMC.Domain.Entities.Quiz", null)
@@ -113,8 +156,15 @@ namespace QuizeMC.Infrastructure.EntityFramework.Migrations
                     b.Navigation("Answers");
                 });
 
+            modelBuilder.Entity("QuizeMC.Domain.Entities.Participant", b =>
+                {
+                    b.Navigation("CompletedQuizzes");
+                });
+
             modelBuilder.Entity("QuizeMC.Domain.Entities.Quiz", b =>
                 {
+                    b.Navigation("Participants");
+
                     b.Navigation("Questions");
                 });
 #pragma warning restore 612, 618
