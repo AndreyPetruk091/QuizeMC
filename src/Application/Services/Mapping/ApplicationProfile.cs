@@ -1,27 +1,50 @@
 ﻿using AutoMapper;
-using QuizeMC.Application.Models.Paticipiant;
+using QuizeMC.Application.Models.Admin;
+using QuizeMC.Application.Models.Answer;
+using QuizeMC.Application.Models.Category;
 using QuizeMC.Application.Models.Question;
 using QuizeMC.Application.Models.Quiz;
 using QuizeMC.Domain.Entities;
+using QuizeMC.Domain.ValueObjects;
 
-namespace Services.Mapping
+namespace QuizeMC.Application.Services.Mapping
 {
-    public class ApplicationProfile : Profile //++
+    public class ApplicationProfile : Profile
     {
         public ApplicationProfile()
         {
+            // Admin mappings
+            CreateMap<Admin, AdminModel>()
+                .ForMember(dest => dest.CreatedQuizzesCount, opt => opt.MapFrom(src => src.CreatedQuizzes.Count))
+                .ForMember(dest => dest.CreatedCategoriesCount, opt => opt.MapFrom(src => src.CreatedCategories.Count));
+
+            // Category mappings
+            CreateMap<Category, CategoryModel>()
+                .ForMember(dest => dest.QuizzesCount, opt => opt.MapFrom(src => src.Quizzes.Count))
+                .ForMember(dest => dest.CreatedByAdminEmail, opt => opt.MapFrom(src => src.CreatedByAdmin.Email.Value));
+
+            // Quiz mappings
             CreateMap<Quiz, QuizModel>()
-                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
-                .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions));
+                .ForMember(dest => dest.QuestionsCount, opt => opt.MapFrom(src => src.Questions.Count))
+                .ForMember(dest => dest.CreatedByAdminEmail, opt => opt.MapFrom(src => src.CreatedByAdmin.Email.Value))
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name.Value));
 
+            // Question mappings
             CreateMap<Question, QuestionModel>()
-                .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Text))
-                .ForMember(dest => dest.Answers, opt => opt.MapFrom(src => src.Answers.Select(a => a.Text.Value)))
-                .ForMember(dest => dest.CorrectAnswerIndex, opt => opt.MapFrom(src => src.CorrectAnswerIndex));
+                .ForMember(dest => dest.Answers, opt => opt.MapFrom(src => src.Answers));
 
-            CreateMap< Participant , ParticipantModel>()
-                .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Username));
+            CreateMap<Question, QuestionWithAnswersModel>()
+                .ForMember(dest => dest.Answers, opt => opt.MapFrom(src => src.Answers));
+
+            // Answer mappings
+            CreateMap<Answer, AnswerModel>();
+            CreateMap<Answer, AnswerCreateModel>();
+
+            // Reverse mappings for updates
+            CreateMap<CategoryUpdateModel, Category>();
+            CreateMap<QuizUpdateModel, Quiz>();
+            CreateMap<QuestionUpdateModel, Question>();
+            CreateMap<AnswerUpdateModel, Answer>();
         }
     }
 }

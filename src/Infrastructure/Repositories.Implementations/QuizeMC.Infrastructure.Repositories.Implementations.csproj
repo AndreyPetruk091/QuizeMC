@@ -1,14 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Domain\Repositories.Abstractions\QuizeMC.Domain.Repositories.Abstractions.csproj" />
-    <ProjectReference Include="..\..\Domain\Domain\QuizeMC.Domain.csproj" />
-  </ItemGroup>
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<ItemGroup>
+		<!-- Entity Framework Core (только базовые пакеты) -->
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Project References -->
+		<ProjectReference Include="..\..\Domain\Domain\QuizeMC.Domain.csproj" />
+		<ProjectReference Include="..\..\Domain\Repositories.Abstractions\QuizeMC.Domain.Repositories.Abstractions.csproj" />
+		<ProjectReference Include="..\EntityFramework\QuizeMC.Infrastructure.EntityFramework.csproj" />
+		
+	</ItemGroup>
 
 </Project>

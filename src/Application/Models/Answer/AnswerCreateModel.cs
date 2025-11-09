@@ -1,6 +1,4 @@
 ﻿namespace QuizeMC.Application.Models.Answer
 {
-    public record AnswerCreateModel(
-       string Text
-   );
+    public record AnswerCreateModel(string Text) : CreateModel;
 }

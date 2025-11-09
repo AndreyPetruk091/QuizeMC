@@ -1,4 +1,5 @@
 ﻿using QuizeMC.Domain.ValueObjects.Base;
+using QuizeMC.Domain.ValueObjects.Exceptions;
 
 namespace QuizeMC.Domain.ValueObjects
 {
@@ -12,10 +13,13 @@ namespace QuizeMC.Domain.ValueObjects
 
         public QuizTitle(string value)
         {
-            if (string.IsNullOrWhiteSpace(value) || value.Length > MaxLength)
-                throw new ArgumentException($"Title must be 1-{MaxLength} characters");
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ValidationException("Quiz title cannot be empty");
 
-            Value = value;
+            if (value.Length > MaxLength)
+                throw new ValidationException($"Quiz title cannot exceed {MaxLength} characters");
+
+            Value = value.Trim();
         }
 
         protected override IEnumerable<object> GetAtomicValues()

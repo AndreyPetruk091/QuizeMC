@@ -45,10 +45,24 @@ namespace QuizeMC.Domain.Entities
             ValidateAnswerIndex(CorrectAnswerIndex);
         }
 
+        public void UpdateText(QuestionText newText)
+        {
+            Text = newText ?? throw new QuestionException("Question text cannot be null.");
+        }
+
+        public void UpdateCorrectAnswerIndex(AnswerIndex newIndex)
+        {
+            CorrectAnswerIndex = newIndex;
+            ValidateAnswerIndex(newIndex);
+        }
+
         private void ValidateAnswerIndex(AnswerIndex index)
         {
             if (index.Value < 0 || index.Value >= _answers.Count)
                 throw new QuestionException($"Answer index must be between 0 and {_answers.Count - 1}.");
         }
+
+        public bool HasAnswers => _answers.Count > 0;
+        public int AnswersCount => _answers.Count;
     }
 }

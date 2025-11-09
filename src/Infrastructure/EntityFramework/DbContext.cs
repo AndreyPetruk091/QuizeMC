@@ -1,55 +1,60 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QuizeMC.Domain.Entities;
-using QuizeMC.Domain.ValueObjects;
 
-namespace QuizeMC.Infrastructure.EntityFramework;
-
-public class ApplicationDbContext : DbContext
+namespace QuizeMC.Infrastructure.EntityFramework
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-        : base(options) { }
-
-    public DbSet<Quiz> Quizzes => Set<Quiz>();
-    public DbSet<Question> Questions => Set<Question>();
-    public DbSet<Participant> Participants => Set<Participant>();
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    public class ApplicationDbContext : DbContext
     {
-        // Конфигурация для Quiz
-        modelBuilder.Entity<Quiz>(q =>
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+            : base(options) { }
+
+        public DbSet<Admin> Admins => Set<Admin>();
+        public DbSet<Category> Categories => Set<Category>();
+        public DbSet<Quiz> Quizzes => Set<Quiz>();
+        public DbSet<Question> Questions => Set<Question>();
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            q.Property(x => x.Title)
-                .HasConversion(t => t.Value, v => new QuizTitle(v));
+            base.OnModelCreating(modelBuilder);
 
-            q.HasMany(x => x.Questions)
-                .WithOne()
-                .HasForeignKey("QuizId");
-        });
-
-        // Конфигурация для Question
-        modelBuilder.Entity<Question>(q =>
-        {
-            q.Property(x => x.Text)
-                .HasConversion(t => t.Value, v => new QuestionText(v));
-
-            q.Property(x => x.CorrectAnswerIndex)
-                .HasConversion(i => i.Value, v => new AnswerIndex(v));
-
-            // Настройка Answers как owned types (без ключа)
-            q.OwnsMany(x => x.Answers, a =>
+            // Базовая конфигурация без сложных индексов
+            modelBuilder.Entity<Admin>(entity =>
             {
-                a.Property(ans => ans.Text)
-                    .HasConversion(t => t.Value, v => new AnswerText(v));
+                entity.HasKey(e => e.Id);
+
+                entity.OwnsOne(e => e.Email);
+                entity.OwnsOne(e => e.PasswordHash);
             });
-        });
 
-        // Конфигурация для Participant
-        modelBuilder.Entity<Participant>(p =>
-        {
-            p.Property(x => x.Username)
-                .HasConversion(u => u.Value, v => new Username(v));
-        });
+            modelBuilder.Entity<Category>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.OwnsOne(e => e.Name);
+                entity.OwnsOne(e => e.Description);
+            });
 
-        base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Quiz>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.OwnsOne(e => e.Title);
+                entity.OwnsOne(e => e.Description);
+                entity.Property(e => e.Status).HasConversion<string>();
+            });
+
+            modelBuilder.Entity<Question>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.OwnsOne(e => e.Text);
+                entity.OwnsOne(e => e.CorrectAnswerIndex);
+
+                entity.OwnsMany(e => e.Answers, a =>
+                {
+                    a.WithOwner().HasForeignKey("QuestionId");
+                    a.Property<int>("Id").ValueGeneratedOnAdd();
+                    a.HasKey("Id");
+                    a.OwnsOne(ans => ans.Text);
+                });
+            });
+        }
     }
-} 
+}

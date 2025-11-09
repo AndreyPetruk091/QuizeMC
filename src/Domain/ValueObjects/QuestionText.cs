@@ -14,13 +14,12 @@ namespace QuizeMC.Domain.ValueObjects
         public QuestionText(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new QuestionTextException(ExceptionMessages.NullValue);
+                throw new ValidationException("Question text cannot be empty");
 
             if (value.Length > MaxLength)
-                throw new QuestionTextException(
-                    ExceptionMessages.Format(ExceptionMessages.NullValue, MaxLength));
+                throw new ValidationException($"Question text cannot exceed {MaxLength} characters");
 
-            Value = value;
+            Value = value.Trim();
         }
 
         protected override IEnumerable<object> GetAtomicValues()

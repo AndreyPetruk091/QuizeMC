@@ -1,11 +1,10 @@
-﻿namespace QuizeMC.Application.Application.Models
+﻿using QuizeMC.Application.Application.Models;
+
+namespace QuizeMC.Application.Models
 {
     /// <summary>
-    /// Базовая модель участника системы
+    /// Базовая модель сущности системы
     /// </summary>
-    /// <param name="Id">Уникальный идентификатор участника</param>
-    /// <param name="Username">Имя пользователя</param>
-    public abstract record Model(Guid Id, string Username)
-        : IModel<Guid>;
+    /// <param name="Id">Уникальный идентификатор сущности</param>
+    public abstract record Model(Guid Id) : IModel<Guid>;
 }
-

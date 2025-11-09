@@ -1,13 +1,15 @@
-﻿
-using QuizeMC.Application.Models.Question;
+﻿using QuizeMC.Application.Models.Question;
+using QuizeMC.Application.Models.Common;
 
-
-namespace QuizeMC.Application.Services.Abstactions
+namespace QuizeMC.Application.Services.Abstractions
 {
     public interface IQuestionApplicationService
     {
-        Task<QuestionModel?> GetQuestionByIdAsync(Guid id, CancellationToken ct);
-        Task<bool> AddQuestionToQuizAsync(Guid quizId, QuestionCreateModel model, CancellationToken ct);
-        Task<bool> RemoveQuestionFromQuizAsync(Guid questionId, CancellationToken ct);
+        Task<ApiResponse<QuestionModel>> CreateQuestionAsync(QuestionCreateModel createModel, Guid quizId);
+        Task<ApiResponse<QuestionModel>> GetQuestionAsync(Guid questionId);
+        Task<ApiResponse> UpdateQuestionAsync(Guid questionId, QuestionUpdateModel updateModel);
+        Task<ApiResponse> DeleteQuestionAsync(Guid questionId);
+        Task<ApiResponse<IEnumerable<QuestionModel>>> GetQuestionsByQuizAsync(Guid quizId);
+        Task<ApiResponse> ReorderQuestionsAsync(Guid quizId, List<Guid> questionIdsInOrder);
     }
 }

@@ -1,12 +1,20 @@
-﻿using QuizeMC.Common.Enums;
-using QuizeMC.Application.Models.Question;
+﻿using QuizeMC.Domain.Enums;
 
 namespace QuizeMC.Application.Models.Quiz
 {
     public record QuizModel(
         Guid Id,
         string Title,
-        IEnumerable<QuestionModel> Questions,
-        QuizStatus Status
-    );
+        string Description,
+        QuizStatus Status,
+        DateTime CreatedAt,
+        DateTime? PublishedAt,
+        DateTime? ArchivedAt,
+        Guid CreatedByAdminId,
+        string CreatedByAdminEmail,
+        Guid CategoryId,
+        string CategoryName,
+        int QuestionsCount,
+        int Complexity
+    ) : Model(Id);
 }

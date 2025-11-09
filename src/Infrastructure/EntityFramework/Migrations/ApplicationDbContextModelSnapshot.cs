@@ -17,51 +17,48 @@ namespace QuizeMC.Infrastructure.EntityFramework.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.5")
+                .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("ParticipantQuiz", b =>
+            modelBuilder.Entity("QuizeMC.Domain.Entities.Admin", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CompletedAt")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("ParticipantId")
-                        .HasColumnType("uuid");
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
 
-                    b.Property<Guid>("QuizId")
-                        .HasColumnType("uuid");
+                    b.Property<DateTime?>("LastLoginAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParticipantId");
-
-                    b.HasIndex("QuizId");
-
-                    b.ToTable("ParticipantQuiz");
+                    b.ToTable("Admins");
                 });
 
-            modelBuilder.Entity("QuizeMC.Domain.Entities.Participant", b =>
+            modelBuilder.Entity("QuizeMC.Domain.Entities.Category", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("IsBanned")
-                        .HasColumnType("boolean");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("CreatedByAdminId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Participants");
+                    b.HasIndex("CreatedByAdminId");
+
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("QuizeMC.Domain.Entities.Question", b =>
@@ -70,15 +67,8 @@ namespace QuizeMC.Infrastructure.EntityFramework.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("CorrectAnswerIndex")
-                        .HasColumnType("integer");
-
                     b.Property<Guid?>("QuizId")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -93,35 +83,110 @@ namespace QuizeMC.Infrastructure.EntityFramework.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
+                    b.Property<DateTime?>("ArchivedAt")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Title")
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedByAdminId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("PublishedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("CreatedByAdminId");
+
                     b.ToTable("Quizzes");
                 });
 
-            modelBuilder.Entity("ParticipantQuiz", b =>
+            modelBuilder.Entity("QuizeMC.Domain.Entities.Admin", b =>
                 {
-                    b.HasOne("QuizeMC.Domain.Entities.Participant", "Participant")
-                        .WithMany("CompletedQuizzes")
-                        .HasForeignKey("ParticipantId")
+                    b.OwnsOne("QuizeMC.Domain.ValueObjects.Email", "Email", b1 =>
+                        {
+                            b1.Property<Guid>("AdminId")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("AdminId");
+
+                            b1.ToTable("Admins");
+
+                            b1.WithOwner()
+                                .HasForeignKey("AdminId");
+                        });
+
+                    b.OwnsOne("QuizeMC.Domain.ValueObjects.PasswordHash", "PasswordHash", b1 =>
+                        {
+                            b1.Property<Guid>("AdminId")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("AdminId");
+
+                            b1.ToTable("Admins");
+
+                            b1.WithOwner()
+                                .HasForeignKey("AdminId");
+                        });
+
+                    b.Navigation("Email")
+                        .IsRequired();
+
+                    b.Navigation("PasswordHash")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("QuizeMC.Domain.Entities.Category", b =>
+                {
+                    b.HasOne("QuizeMC.Domain.Entities.Admin", "CreatedByAdmin")
+                        .WithMany("CreatedCategories")
+                        .HasForeignKey("CreatedByAdminId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("QuizeMC.Domain.Entities.Quiz", "Quiz")
-                        .WithMany("Participants")
-                        .HasForeignKey("QuizId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.OwnsOne("QuizeMC.Domain.ValueObjects.CategoryDescription", "Description", b1 =>
+                        {
+                            b1.Property<Guid>("CategoryId")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("CategoryId");
+
+                            b1.ToTable("Categories");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CategoryId");
+                        });
+
+                    b.OwnsOne("QuizeMC.Domain.ValueObjects.CategoryName", "Name", b1 =>
+                        {
+                            b1.Property<Guid>("CategoryId")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("CategoryId");
+
+                            b1.ToTable("Categories");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CategoryId");
+                        });
+
+                    b.Navigation("CreatedByAdmin");
+
+                    b.Navigation("Description")
                         .IsRequired();
 
-                    b.Navigation("Participant");
-
-                    b.Navigation("Quiz");
+                    b.Navigation("Name")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("QuizeMC.Domain.Entities.Question", b =>
@@ -132,39 +197,141 @@ namespace QuizeMC.Infrastructure.EntityFramework.Migrations
 
                     b.OwnsMany("QuizeMC.Domain.ValueObjects.Answer", "Answers", b1 =>
                         {
-                            b1.Property<Guid>("QuestionId")
-                                .HasColumnType("uuid");
-
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("integer");
 
                             NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
 
-                            b1.Property<string>("Text")
-                                .IsRequired()
-                                .HasColumnType("text");
+                            b1.Property<Guid>("QuestionId")
+                                .HasColumnType("uuid");
 
-                            b1.HasKey("QuestionId", "Id");
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("QuestionId");
 
                             b1.ToTable("Answer");
+
+                            b1.WithOwner()
+                                .HasForeignKey("QuestionId");
+
+                            b1.OwnsOne("QuizeMC.Domain.ValueObjects.AnswerText", "Text", b2 =>
+                                {
+                                    b2.Property<int>("AnswerId")
+                                        .HasColumnType("integer");
+
+                                    b2.HasKey("AnswerId");
+
+                                    b2.ToTable("Answer");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("AnswerId");
+                                });
+
+                            b1.Navigation("Text")
+                                .IsRequired();
+                        });
+
+                    b.OwnsOne("QuizeMC.Domain.ValueObjects.AnswerIndex", "CorrectAnswerIndex", b1 =>
+                        {
+                            b1.Property<Guid>("QuestionId")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("QuestionId");
+
+                            b1.ToTable("Questions");
+
+                            b1.WithOwner()
+                                .HasForeignKey("QuestionId");
+                        });
+
+                    b.OwnsOne("QuizeMC.Domain.ValueObjects.QuestionText", "Text", b1 =>
+                        {
+                            b1.Property<Guid>("QuestionId")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("QuestionId");
+
+                            b1.ToTable("Questions");
 
                             b1.WithOwner()
                                 .HasForeignKey("QuestionId");
                         });
 
                     b.Navigation("Answers");
-                });
 
-            modelBuilder.Entity("QuizeMC.Domain.Entities.Participant", b =>
-                {
-                    b.Navigation("CompletedQuizzes");
+                    b.Navigation("CorrectAnswerIndex")
+                        .IsRequired();
+
+                    b.Navigation("Text")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("QuizeMC.Domain.Entities.Quiz", b =>
                 {
-                    b.Navigation("Participants");
+                    b.HasOne("QuizeMC.Domain.Entities.Category", "Category")
+                        .WithMany("Quizzes")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
+                    b.HasOne("QuizeMC.Domain.Entities.Admin", "CreatedByAdmin")
+                        .WithMany("CreatedQuizzes")
+                        .HasForeignKey("CreatedByAdminId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("QuizeMC.Domain.ValueObjects.QuizDescription", "Description", b1 =>
+                        {
+                            b1.Property<Guid>("QuizId")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("QuizId");
+
+                            b1.ToTable("Quizzes");
+
+                            b1.WithOwner()
+                                .HasForeignKey("QuizId");
+                        });
+
+                    b.OwnsOne("QuizeMC.Domain.ValueObjects.QuizTitle", "Title", b1 =>
+                        {
+                            b1.Property<Guid>("QuizId")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("QuizId");
+
+                            b1.ToTable("Quizzes");
+
+                            b1.WithOwner()
+                                .HasForeignKey("QuizId");
+                        });
+
+                    b.Navigation("Category");
+
+                    b.Navigation("CreatedByAdmin");
+
+                    b.Navigation("Description")
+                        .IsRequired();
+
+                    b.Navigation("Title")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("QuizeMC.Domain.Entities.Admin", b =>
+                {
+                    b.Navigation("CreatedCategories");
+
+                    b.Navigation("CreatedQuizzes");
+                });
+
+            modelBuilder.Entity("QuizeMC.Domain.Entities.Category", b =>
+                {
+                    b.Navigation("Quizzes");
+                });
+
+            modelBuilder.Entity("QuizeMC.Domain.Entities.Quiz", b =>
+                {
                     b.Navigation("Questions");
                 });
 #pragma warning restore 612, 618
