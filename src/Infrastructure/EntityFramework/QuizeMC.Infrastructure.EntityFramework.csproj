@@ -37,6 +37,8 @@
 	<ItemGroup>
 		<!-- Project References -->
 		<ProjectReference Include="..\..\Domain\Domain\QuizeMC.Domain.csproj" />
+		<ProjectReference Include="..\..\Domain\Repositories.Abstractions\QuizeMC.Domain.Repositories.Abstractions.csproj" />
+		<ProjectReference Include="..\..\Domain\Services\QuizeMC.Domain.Services.csproj" />
 	
 	</ItemGroup>
 
